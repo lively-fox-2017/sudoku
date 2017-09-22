@@ -4,6 +4,8 @@
 class Sudoku {
   constructor(board_string) {
     this.numbersPosition=this.dataMapping(board_string);
+    this.stackPosition=[];
+    this.trackZeroPosition();
 
   }
 
@@ -191,25 +193,108 @@ class Sudoku {
   //   }
   //
   // }
-  backTrackSolution(indexBaris, indexKolom){
-    let nextBaris = indexBaris;
-    let nextKolom = indexKolom;
-    if(indexBaris<7){
-      nextKolom++;
-    }else{
-      nextBaris++;
-      nextKolom=0;
-    }
-    for(let i =1; i<= this.numbersPosition.length+1;i++){
-      if(this.isAvailable(i, indexBaris, indexKolom)){
-        this.numbersPosition[indexBaris][indexKolom]=i;
-        console.log('baris : ',indexBaris,' kolom : ',indexKolom);
-        this.backTrackSolution(nextBaris, nextKolom);
+  // backTrackSolution(indexBaris, indexKolom){
+  //   let nextBaris = indexBaris;
+  //   let nextKolom = indexKolom;
+  //   if(indexKolom<=8){
+  //     nextKolom++;
+  //   }else{
+  //     nextBaris++;
+  //     nextKolom=0;
+  //   }
+  //   if (this.numbersPosition[indexBaris][indexKolom]==0){
+  //     for(let i =1; i<= this.numbersPosition.length+1;i++){
+  //       if(this.isAvailable(i, indexBaris, indexKolom)){
+  //         this.numbersPosition[indexBaris][indexKolom]=i;
+  //         console.log('baris : ',indexBaris,' kolom : ',indexKolom);
+  //         console.log('next baris : ',nextBaris,' kolom : ',nextKolom);
+  //         this.backTrackSolution(nextBaris, nextKolom);
+  //       }
+  //       if(i==10){
+  //         this.numbersPosition[indexBaris][indexKolom]=0;
+  //         return 10;
+  //       }
+  //     }
+  //   }
+  //   if (nextBaris<9&&nextKolom<9){
+  //     this.backTrackSolution(nextBaris, nextKolom)
+  //   }
+  // }
+  trackZeroPosition(){
+    for(let baris =0; baris<9;baris++){
+      for(let kolom =0;kolom<9; kolom++){
+        if(this.numbersPosition[baris][kolom]==0){
+          this.stackPosition.push([baris,kolom]);
+        }
       }
-      if(i==9){
-        return 9;
-      }
     }
+  }
+
+//---------===============VERSI 2====================-------------
+  // backTrackSolution(indexBaris, indexKolom){
+  //   let nextBaris = indexBaris;
+  //   let nextKolom = indexKolom;
+  //   console.log(`baris: ${indexBaris} kolom: ${indexKolom}`);
+  //   console.log(`next baris: ${nextBaris} next kolom: ${nextKolom}`);
+  //   if(indexKolom<=8){
+  //     nextKolom++;
+  //   }else{
+  //     nextBaris++;
+  //     nextKolom=0;
+  //   }
+  //   if (indexBaris==8&& indexKolom==8){
+  //     console.log('done');
+  //     return 'done';
+  //   }
+  //   if(this.numbersPosition[indexBaris][indexKolom]==0){
+  //     //di push ke stack
+  //     for(let i = 1; i<=10; i++){
+  //       console.log(i);
+  //       if (this.isAvailable(i, indexBaris,indexKolom)&&i!=10){
+  //         this.numbersPosition[indexBaris][indexKolom]=i;
+  //         if(this.backTrackSolution(nextBaris,nextKolom)=='done'){
+  //           break
+  //         };
+  //       }if(i ==10){
+  //         //di pop dari stack
+  //         this.numbersPosition[indexBaris][indexKolom]=0;
+  //         return 10;
+  //         //this.backTrackSolution(this.stackPosition.pop())
+  //       }
+  //     }
+  //   }else{
+  //     this.backTrackSolution(nextBaris, nextKolom)
+  //   }
+  // }
+  backTrackSolution(index){
+    let posStack = index||0;
+    //console.log('length : ', this.stackPosition.length);
+    //console.log('index = ',posStack);
+    if(index==this.stackPosition.length){
+      //console.log('masuk beres');
+      return 'done';
+    }
+    for(var i=1; i<=10; i++){
+      if(this.isAvailable(i, this.stackPosition[posStack][0], this.stackPosition[posStack][1]) && i<10){
+        //console.log(i);
+        this.numbersPosition[this.stackPosition[posStack][0]][this.stackPosition[posStack][1]]=i;
+        if(this.backTrackSolution(posStack+1)=='not fit'){
+          this.numbersPosition[this.stackPosition[posStack][0]][this.stackPosition[posStack][1]]=0;
+          continue;
+        };
+        break;
+
+      }
+      if(i==10){
+        this.numbersPosition[this.stackPosition[posStack][0]][this.stackPosition[posStack][1]]=0;
+        return 'not fit'}
+    }
+    //return 'other'
+    //console.log('berhasil ',index);
+
+    //return 'not fit';
+    //this.backTrackSolution(posStack-1);
+
   }
 
   solve(){
@@ -217,7 +302,7 @@ class Sudoku {
     // kalo berhasil lanjut panggil solve lagi
     // kalo hasil return sebelumnya 0 naikin lagi
     // cari lagi next nya
-    this.backTrackSolution(0,0);
+    this.backTrackSolution();
 
   }
 
@@ -253,6 +338,8 @@ var board_string = fs.readFileSync('set-01_sample.unsolved.txt')
 var game = new Sudoku(board_string)
 
 // Remember: this will just fill out what it can and not "guess"
+console.log('Before : ');
+console.log(game.board());
 game.solve()
-
+console.log('After : ');
 console.log(game.board())
