@@ -6,7 +6,7 @@ class Sudoku {
     for (let i = 0; i < 9; i++) {
       let baris = [];
       for (let j = 0; j < 9; j++) {
-        baris.push(board_string[i + j]);
+        baris.push(board_string[i * 9 + j]);
       }
       this.boardELement.push(baris);
     }
@@ -54,7 +54,7 @@ class Sudoku {
     return true;
   }
 
-  initWindow(window) {
+  initWindow(x, y) {
     let init = [
       [0, 1, 2],
       [3, 4, 5],
@@ -63,49 +63,19 @@ class Sudoku {
 
     let baris = [];
     let kolom = [];
-    // Choose Window
-    switch (window) {
-      case 0:
-        baris = init[0];
-        kolom = init[0];
-        break;
-      case 1:
-        baris = init[0];
-        kolom = init[1];
-        break;
-      case 2:
-        baris = init[0];
-        kolom = init[2];
-        break;
-      case 3:
-        baris = init[1];
-        kolom = init[0];
-        break;
-      case 4:
-        baris = init[1];
-        kolom = init[1];
-        break;
-      case 5:
-        baris = init[1];
-        kolom = init[2];
-        break;
-      case 6:
-        baris = init[2];
-        kolom = init[0];
-        break;
-      case 7:
-        baris = init[2];
-        kolom = init[1];
-        break;
-      case 8:
-        baris = init[2];
-        kolom = init[2];
-        break;
+
+    for (let i = 0; i < init.length; i++) {
+      if (init[i].indexOf(x) !== -1) {
+        baris = init[i];
+      }
+      if (init[i].indexOf(y) !== -1) {
+        kolom = init[i];
+      }
     }
     return [baris, kolom];
   }
 
-  windowCheck(window) {
+  windowCheck(x, y) {
     let element = {
       '1': 1,
       '2': 1,
@@ -117,7 +87,7 @@ class Sudoku {
       '8': 1,
       '9': 1,
     }
-    let areaWindow = this.initWindow(window);
+    let areaWindow = this.initWindow(x, y);
     for (let i = 0; i < areaWindow[0].length; i++) {
       for (let j = 0; j < areaWindow[1].length; j++) {
         element[this.boardELement[areaWindow[0][i]][areaWindow[0][j]]]--;
@@ -128,7 +98,28 @@ class Sudoku {
     return true;
   }
 
-  solve() {}
+  initNumber() {
+    for (let i = 0; i < 9; i++) {
+      for (let j = 0; j < 9; j++) {
+        if (this.boardELement[i][j] == 0) {
+          for (let k = 1; k <= 10; k++) {
+            this.boardELement[i][j] = k;
+            if (k !== 10) {
+              if (this.rowCheck(i) && this.colCheck(j) && this.windowCheck(i, j)) {
+                break;
+              }
+            } else {
+              this.boardELement[i][j] = 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  solve() {
+
+  }
 
   // Returns a string representing the current state of the board
   board() {
@@ -163,5 +154,6 @@ var game = new Sudoku(board_string)
 
 // Remember: this will just fill out what it can and not "guess"
 // game.solve()
-
-console.log(game.board())
+console.log(game.board());
+game.initNumber();
+console.log(game.board());
