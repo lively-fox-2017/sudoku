@@ -149,31 +149,75 @@ class Sudoku {
     return false;
   }
 
-  numberGuesser(indexBaris, indexKolom){
-    let rng = Math.round(Math.random()*8)+1;
-    while(!this.isAvailable(rng, indexBaris, indexKolom)){
-      console.log(rng);
-      rng = Math.round(Math.random()*8)+1;
-    }
-    //console.log(indexBaris);
-    //console.log(indexKolom);
-    //console.log(rng);
-    console.log(this.isAvailable(rng,indexBaris,indexKolom));
-    return rng;
-  }
-
-  solve() {
-    //console.log(this.isExistInBaris(3,0));
-    //console.log(this.isExistInKolom(6,0));
-    console.log(this.isExistInLittleSquare(3,6,7));
-    this.numbersPosition[1][2]=this.numberGuesser(1,2);
-    for(let baris in this.numbersPosition){
-      for(let kolom in this.numbersPosition[baris]){
-        if(this.numbersPosition[baris][kolom]==0){
-          this.numbersPosition[baris][kolom]=this.numberGuesser(baris,kolom);
-        }
+  // numberGuesser(indexBaris, indexKolom){
+  //   let rng = Math.round(Math.random()*8)+1;
+  //   let counter = 0
+  //   while(!this.isAvailable(rng, indexBaris, indexKolom)){
+  //     console.log(rng);
+  //     rng = Math.round(Math.random()*8)+1;
+  //     counter++;
+  //     if (counter == 50){
+  //       return 0;
+  //     }
+  //   }
+  //   //console.log(indexBaris);
+  //   //console.log(indexKolom);
+  //   //console.log(rng);
+  //   console.log(this.isAvailable(rng,indexBaris,indexKolom));
+  //   return rng;
+  // }
+  numberGuesser(indexBaris, indexKolom, failedNum){
+    let start=failedNum||1
+    for(let i=start; i<9; i++){
+      if (this.isAvailable(i, indexBaris, indexKolom)){
+        return i;
       }
     }
+    return 0;
+  }
+
+  // solve() {
+  //   //console.log(this.isExistInBaris(3,0));
+  //   //console.log(this.isExistInKolom(6,0));
+  //   console.log(this.isExistInLittleSquare(3,6,7));
+  //   this.numbersPosition[1][2]=this.numberGuesser(1,2);
+  //   //let counter =0;
+  //   for(let baris in this.numbersPosition){
+  //     for(let kolom in this.numbersPosition[baris]){
+  //       if(this.numbersPosition[baris][kolom]==0){
+  //         this.numbersPosition[baris][kolom]=this.numberGuesser(baris,kolom);
+  //       }
+  //     }
+  //   }
+  //
+  // }
+  backTrackSolution(indexBaris, indexKolom){
+    let nextBaris = indexBaris;
+    let nextKolom = indexKolom;
+    if(indexBaris<7){
+      nextKolom++;
+    }else{
+      nextBaris++;
+      nextKolom=0;
+    }
+    for(let i =1; i<= this.numbersPosition.length+1;i++){
+      if(this.isAvailable(i, indexBaris, indexKolom)){
+        this.numbersPosition[indexBaris][indexKolom]=i;
+        console.log('baris : ',indexBaris,' kolom : ',indexKolom);
+        this.backTrackSolution(nextBaris, nextKolom);
+      }
+      if(i==9){
+        return 9;
+      }
+    }
+  }
+
+  solve(){
+    // kalo ketemu 0 return sesuatu
+    // kalo berhasil lanjut panggil solve lagi
+    // kalo hasil return sebelumnya 0 naikin lagi
+    // cari lagi next nya
+    this.backTrackSolution(0,0);
 
   }
 
