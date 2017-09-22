@@ -120,4 +120,9 @@ while(row < 12){
   col = 3;
 }
 console.log(sudoInRegion);
-// check per col
+// check per region
+
+for(var i = 0;i<game.sudoBoard.length;i++){
+  console.log('kolom ke-'+i+' = ',game.checkCol(sudoInRegion[i]));
+  console.log(sudoInRegion[i]);
+}
