@@ -1,12 +1,331 @@
+
 "use strict"
 
 class Sudoku {
-  constructor(board_string) {}
+  constructor(board_string) {
+    this.numbersPosition=this.dataMapping(board_string);
+    this.stackPosition=[];
+    this.trackZeroPosition();
 
-  solve() {}
+  }
+
+  dataMapping(board_string){
+    let numbersPosition=[];
+    let baris;
+    for(let i in board_string){
+      if(i%9 == 0){
+        baris= baris+1||0;
+        numbersPosition.push([]);
+      }
+      numbersPosition[baris].push(board_string[i]);
+    }
+    return numbersPosition;
+  }
+
+  isExistInBaris(nomor, indexBaris){
+    for(let kolomInBaris in this.numbersPosition[indexBaris]){
+      if (nomor==parseInt(this.numbersPosition[indexBaris][kolomInBaris])){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isExistInKolom(nomor, indexKolom){
+    for(let i=0; i< this.numbersPosition.length;i++){
+      if (parseInt(this.numbersPosition[i][indexKolom])==nomor){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  areaSearcher(indexBaris, indexKolom){
+    let pos={};
+    if (indexBaris>=0&&indexBaris<3){
+      pos.x=0;
+    }else if(indexBaris>=3&&indexBaris<6){
+      pos.x=1;
+    }else if(indexBaris>=6&&indexBaris<9){
+      pos.x=2;
+    }
+
+    if (indexKolom>=0&&indexKolom<3){
+      pos.y=0;
+    }else if(indexKolom>=3&&indexKolom<6){
+      pos.y=1;
+    }else if(indexKolom>=6&&indexKolom<9){
+      pos.y=2;
+    }
+
+    if (pos.x==0&&pos.y==0){
+      return 'area1';
+    } else if(pos.x==0&&pos.y==1){
+      return 'area2';
+    } else if(pos.x==0&&pos.y==2){
+      return 'area3';
+    }
+
+    else if(pos.x==1&&pos.y==0){
+      return 'area4';
+    } else if(pos.x==1&&pos.y==1){
+      return 'area5';
+    } else if(pos.x==1&&pos.y==2){
+      return 'area6';
+    }
+
+    else if(pos.x==2&&pos.y==0){
+      return 'area7';
+    } else if(pos.x==2&&pos.y==1){
+      return 'area8';
+    } else if(pos.x==2&&pos.y==2){
+      return 'area9';
+    }
+
+
+  }
+
+  isExistInArea(nomor ,indexBarisAwal, indexKolomAwal, indexBarisAkhir, indexKolomAkhir){
+    //let counter =0;
+    for(let baris = indexBarisAwal; baris<=indexBarisAkhir;baris++ ){
+      for(let kolom = indexKolomAwal; kolom<=indexKolomAkhir;kolom++){
+        //console.log('baris : ',baris);
+        //console.log('kolom : ',kolom);
+        if(parseInt(this.numbersPosition[baris][kolom])==nomor){
+          //console.log('ada');
+          return true;
+        //  counter++;
+        //  if (counter>2){
+        //    return true;
+        //  }
+        }
+      }
+    }
+    return false;
+  }
+
+  isExistInLittleSquare(nomor, indexBaris, indexKolom){
+    //
+    let area=this.areaSearcher(indexBaris, indexKolom);
+    switch (area) {
+      case 'area1':
+        return this.isExistInArea(nomor,0,0,2,2)
+        break;
+      case 'area2':
+        return this.isExistInArea(nomor,0,3,2,5)
+        break;
+      case 'area3':
+        return this.isExistInArea(nomor,0,6,2,8)
+        break;
+      case 'area4':
+        return this.isExistInArea(nomor,3,0,5,2)
+        break;
+      case 'area5':
+        return this.isExistInArea(nomor,3,3,5,5)
+        break;
+      case 'area6':
+        return this.isExistInArea(nomor,3,6,5,8)
+        break;
+      case 'area7':
+        return this.isExistInArea(nomor,6,0,8,2)
+        break;
+      case 'area8':
+        return this.isExistInArea(nomor,6,3,8,5)
+        break;
+      case 'area9':
+        return this.isExistInArea(nomor,6,6,8,8)
+        break;
+      default:
+
+    }
+    //console.log(area);
+  }
+
+  isAvailable(nomor, indexBaris, indexKolom){
+    let existInBaris = this.isExistInBaris(nomor, indexBaris);
+    let existInKolom = this.isExistInKolom(nomor, indexKolom);
+    let existInSquare = this.isExistInLittleSquare(nomor, indexBaris, indexKolom);
+    if( !existInBaris&&!existInKolom&&!existInSquare){
+      return true;
+    }
+    return false;
+  }
+
+  // numberGuesser(indexBaris, indexKolom){
+  //   let rng = Math.round(Math.random()*8)+1;
+  //   let counter = 0
+  //   while(!this.isAvailable(rng, indexBaris, indexKolom)){
+  //     console.log(rng);
+  //     rng = Math.round(Math.random()*8)+1;
+  //     counter++;
+  //     if (counter == 50){
+  //       return 0;
+  //     }
+  //   }
+  //   //console.log(indexBaris);
+  //   //console.log(indexKolom);
+  //   //console.log(rng);
+  //   console.log(this.isAvailable(rng,indexBaris,indexKolom));
+  //   return rng;
+  // }
+  numberGuesser(indexBaris, indexKolom, failedNum){
+    let start=failedNum||1
+    for(let i=start; i<9; i++){
+      if (this.isAvailable(i, indexBaris, indexKolom)){
+        return i;
+      }
+    }
+    return 0;
+  }
+
+  // solve() {
+  //   //console.log(this.isExistInBaris(3,0));
+  //   //console.log(this.isExistInKolom(6,0));
+  //   console.log(this.isExistInLittleSquare(3,6,7));
+  //   this.numbersPosition[1][2]=this.numberGuesser(1,2);
+  //   //let counter =0;
+  //   for(let baris in this.numbersPosition){
+  //     for(let kolom in this.numbersPosition[baris]){
+  //       if(this.numbersPosition[baris][kolom]==0){
+  //         this.numbersPosition[baris][kolom]=this.numberGuesser(baris,kolom);
+  //       }
+  //     }
+  //   }
+  //
+  // }
+  // backTrackSolution(indexBaris, indexKolom){
+  //   let nextBaris = indexBaris;
+  //   let nextKolom = indexKolom;
+  //   if(indexKolom<=8){
+  //     nextKolom++;
+  //   }else{
+  //     nextBaris++;
+  //     nextKolom=0;
+  //   }
+  //   if (this.numbersPosition[indexBaris][indexKolom]==0){
+  //     for(let i =1; i<= this.numbersPosition.length+1;i++){
+  //       if(this.isAvailable(i, indexBaris, indexKolom)){
+  //         this.numbersPosition[indexBaris][indexKolom]=i;
+  //         console.log('baris : ',indexBaris,' kolom : ',indexKolom);
+  //         console.log('next baris : ',nextBaris,' kolom : ',nextKolom);
+  //         this.backTrackSolution(nextBaris, nextKolom);
+  //       }
+  //       if(i==10){
+  //         this.numbersPosition[indexBaris][indexKolom]=0;
+  //         return 10;
+  //       }
+  //     }
+  //   }
+  //   if (nextBaris<9&&nextKolom<9){
+  //     this.backTrackSolution(nextBaris, nextKolom)
+  //   }
+  // }
+  trackZeroPosition(){
+    for(let baris =0; baris<9;baris++){
+      for(let kolom =0;kolom<9; kolom++){
+        if(this.numbersPosition[baris][kolom]==0){
+          this.stackPosition.push([baris,kolom]);
+        }
+      }
+    }
+  }
+
+//---------===============VERSI 2====================-------------
+  // backTrackSolution(indexBaris, indexKolom){
+  //   let nextBaris = indexBaris;
+  //   let nextKolom = indexKolom;
+  //   console.log(`baris: ${indexBaris} kolom: ${indexKolom}`);
+  //   console.log(`next baris: ${nextBaris} next kolom: ${nextKolom}`);
+  //   if(indexKolom<=8){
+  //     nextKolom++;
+  //   }else{
+  //     nextBaris++;
+  //     nextKolom=0;
+  //   }
+  //   if (indexBaris==8&& indexKolom==8){
+  //     console.log('done');
+  //     return 'done';
+  //   }
+  //   if(this.numbersPosition[indexBaris][indexKolom]==0){
+  //     //di push ke stack
+  //     for(let i = 1; i<=10; i++){
+  //       console.log(i);
+  //       if (this.isAvailable(i, indexBaris,indexKolom)&&i!=10){
+  //         this.numbersPosition[indexBaris][indexKolom]=i;
+  //         if(this.backTrackSolution(nextBaris,nextKolom)=='done'){
+  //           break
+  //         };
+  //       }if(i ==10){
+  //         //di pop dari stack
+  //         this.numbersPosition[indexBaris][indexKolom]=0;
+  //         return 10;
+  //         //this.backTrackSolution(this.stackPosition.pop())
+  //       }
+  //     }
+  //   }else{
+  //     this.backTrackSolution(nextBaris, nextKolom)
+  //   }
+  // }
+  backTrackSolution(index){
+    let posStack = index||0;
+    //console.log('length : ', this.stackPosition.length);
+    //console.log('index = ',posStack);
+    if(index==this.stackPosition.length){
+      //console.log('masuk beres');
+      return 'done';
+    }
+    for(var i=1; i<=10; i++){
+      if(this.isAvailable(i, this.stackPosition[posStack][0], this.stackPosition[posStack][1]) && i<10){
+        //console.log(i);
+        this.numbersPosition[this.stackPosition[posStack][0]][this.stackPosition[posStack][1]]=i;
+        if(this.backTrackSolution(posStack+1)=='not fit'){
+          this.numbersPosition[this.stackPosition[posStack][0]][this.stackPosition[posStack][1]]=0;
+          continue;
+        };
+        break;
+
+      }
+      if(i==10){
+        this.numbersPosition[this.stackPosition[posStack][0]][this.stackPosition[posStack][1]]=0;
+        return 'not fit'}
+    }
+    //return 'other'
+    //console.log('berhasil ',index);
+
+    //return 'not fit';
+    //this.backTrackSolution(posStack-1);
+
+  }
+
+  solve(){
+    // kalo ketemu 0 return sesuatu
+    // kalo berhasil lanjut panggil solve lagi
+    // kalo hasil return sebelumnya 0 naikin lagi
+    // cari lagi next nya
+    this.backTrackSolution();
+
+  }
 
   // Returns a string representing the current state of the board
-  board() {}
+  board() {
+    let result='';
+    for(let baris in this.numbersPosition){
+      if(baris%3==0){
+        result+='-----------------------\n';
+      }
+      for(let kolom in this.numbersPosition[baris]){
+        result+=`${this.numbersPosition[baris][kolom]} `
+        if((kolom+1)%3==0){
+          result+=`| `;
+
+        }
+        //result
+      }
+      result+='\n'
+    }
+    result+='-----------------------\n'
+    return result
+  }
 }
 
 // The file has newlines at the end of each line,
@@ -19,6 +338,8 @@ var board_string = fs.readFileSync('set-01_sample.unsolved.txt')
 var game = new Sudoku(board_string)
 
 // Remember: this will just fill out what it can and not "guess"
+console.log('Before : ');
+console.log(game.board());
 game.solve()
-
+console.log('After : ');
 console.log(game.board())
