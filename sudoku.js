@@ -170,7 +170,7 @@ class Sudoku {
     for(let baris in this.numbersPosition){
       for(let kolom in this.numbersPosition[baris]){
         if(this.numbersPosition[baris][kolom]==0){
-          this.numbersPosition[1][2]=this.numberGuesser(1,2);
+          this.numbersPosition[baris][kolom]=this.numberGuesser(baris,kolom);
         }
       }
     }
