@@ -55,7 +55,20 @@ class Sudoku {
 
   // Returns a string representing the current state of the board
   board() {
-    return this.sudoBoard;
+    var result = "---------------------\n";
+    for(var i =0;i<9;i++){
+      for(var j =0;j<9;j++){
+        result += this.sudoBoard[i][j] + ' ';
+        if((j+1) % 3 === 0 && j !== 8){
+          result+='| ';
+        }
+      }
+      result+='\n';
+      if((i+1)%3===0 && i !== 8){
+        result += "---------------------\n";
+      }
+    }
+    return result;
   }
 
   getAll() {
