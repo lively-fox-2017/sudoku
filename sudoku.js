@@ -2,7 +2,7 @@
 
 /**
  *
- * Sudoku Solver
+ * Sudoku Solver, input type: String
  *
  */
 
@@ -13,8 +13,6 @@ class Sudoku {
     // Unsolved board string, you know, with zeros on 'em
     this.unsolvedBoardString = unsolvedBoardString;
     this.sudokuArray = [];
-    this.solvedList = [];
-    this.unsolvedList = [];
 
   }
 
@@ -53,23 +51,51 @@ class Sudoku {
 
   /**
    *
-   * findZeros(array, row, column)
+   * findZeros(arr, row, col)
    *
    * Find 0, if exist, return true
    *
    */
 
-  findZeros() {
+  findZeros(arr, row, col) {
 
-    // Rows
-    for (let row = 0; row < this.sudokuArray.length; row++) {
+    // Variable to inform it's done or not yet
+    let done = false;
 
-      // Cols
-      for (let col = 0; col < this.sudokuArray[row].length; col++) {
+    // Variable to store result of finder
+    let result = [-1, -1];
 
-        if (this.sudokuArray[row][col] === 0) {
+    while (!done) {
 
-          return true;
+      // row 9 = last row
+      if (row === 9) {
+
+        done = true;
+
+      } else {
+
+        if (arr[row][col] === 0) {
+
+          result[0] = row;
+          result[1] = col;
+
+          // Zero value found!
+          done = true;
+
+        } else {
+
+          if (col < 8) {
+
+            // Increment col by 1
+            col += 1;
+
+          } else {
+
+            // Increment row by 1
+            row += 1;
+            col = 0;
+
+          }
 
         }
 
@@ -77,13 +103,13 @@ class Sudoku {
 
     }
 
-    return false;
+    return result;
 
   }
 
   /**
    *
-   * checkRow(rowNumber, toFind)
+   * checkRow(arr, row, toFind)
    *
    * Check if the number's already in this row
    *
@@ -92,22 +118,26 @@ class Sudoku {
    *
    */
 
-  checkRow(rowNumber, toFind) {
+  checkRow(arr, row, toFind) {
 
-    let arr = this.sudokuArray[rowNumber];
+    for (let col = 0; col < 9; col++) {
 
-    // Checking, if found, return true
-    if (arr.indexOf(toFind) !== -1)
-      return true;
+      if (arr[row][col] === toFind) {
 
-    return false;
+        return false;
+
+      }
+
+    }
+
+    return true;
 
   }
 
 
   /**
    *
-   * checkCol(colNumber, toFind)
+   * checkCol(arr, col, toFind)
    *
    * Check if the number's already in this column
    *
@@ -116,29 +146,25 @@ class Sudoku {
    *
    */
 
-  checkCol(colNumber, toFind) {
+  checkCol(arr, col, toFind) {
 
-    let arr = this.sudokuArray;
-    let newArr = [];
+    for (let row = 0; row < 9; row++) {
 
-    // Generate arr
-    for (let i = 0; i < arr.length; i++) {
+      if (arr[row][col] === toFind) {
 
-      newArr.push(arr[i][colNumber]);
+        return false;
+
+      }
 
     }
 
-    // Checking, if found, return true
-    if (newArr.indexOf(toFind) !== -1)
-      return true;
-
-    return false;
+    return true;
 
   }
 
   /**
    *
-   * check3x3Box(boxNumber, toFind)
+   * check3x3Box(arr, row, col, toFind)
    *
    * Check if the number's already in this 3x3 box
    *
@@ -146,132 +172,91 @@ class Sudoku {
    * If no, return false
    *
    */
-  check3x3Box(boxNumber, toFind) {
+  check3x3Box(arr, row, col, toFind) {
 
-    let arr3x3 = [];
+    row = Math.floor(row / 3) * 3;
+    col = Math.floor(col / 3) * 3;
 
-    let start = 0;
+    // r = row
+    // c = col
+    for (let r = 0; r < 3; r++) {
 
-    let loop = [[0, 1, 2], [3, 4, 5], [6, 7, 8]];
+      for (let c = 0; c < 3; c++) {
 
-    if (boxNumber >= 0 && boxNumber < 3)
-      start = 0;
-    else if (boxNumber >= 3 && boxNumber < 6)
-      start = 3;
-    else if (boxNumber >= 6 && boxNumber < 9)
-      start = 6;
+        if (arr[row + r][col + c] === toFind) {
 
-    for (let i = start; i < (start + 3); i++) {
+          return false;
 
-      for (let j = 0; j < 3; j++) {
-
-        arr3x3.push(this.sudokuArray[i][loop[boxNumber - start][j]]);
+        }
 
       }
 
     }
 
-    // Checking, if found, return true
-    if (arr3x3.indexOf(toFind) !== -1)
-      return true;
-
-    return false;
+    return true;
 
   }
 
   /**
    *
-   * generateBoxNumber(row, col)
+   * validator(arr, row, col, value)
    *
-   * Generate box number for checking on this.solve()
+   * Validating row, column, and 3x3 box
+   * Returns TRUE if valid
    *
    */
 
-  generateBoxNumber(row, col) {
+  validator(arr, row, col, value) {
 
-    if (row >= 0 && row < 3) {
-
-      if (col >= 0 && col < 3)
-        return 0;
-      else if (col >= 3 && col < 6)
-        return 1;
-      else if (col >= 6 && col < 9)
-        return 2;
-
-    } else if (row >= 3 && row < 6) {
-
-      if (col >= 0 && col < 3)
-        return 3;
-      else if (col >= 3 && col < 6)
-        return 4;
-      else if (col >= 6 && col < 9)
-        return 5;
-
-    } else if (row >= 6 && row < 9) {
-
-      if (col >= 0 && col < 3)
-        return 6;
-      else if (col >= 3 && col < 6)
-        return 7;
-      else if (col >= 6 && col < 9)
-        return 8;
-
-    }
+    return this.checkRow(arr, row, value) && this.checkCol(arr, col, value) && this.check3x3Box(arr, row, col, value);
 
   }
 
   /**
    *
-   * solve()
+   * solve(row, col)
    *
    * Function to solve the Sudoku
    * Returns TRUE or FALSE
    *
    */
 
-  solve() {
+  solve(row = 0, col = 0) {
 
-    let boxNumber = 0;
+    let cell = this.findZeros(this.sudokuArray, row, col);
 
-    // Rows
-    for (let row = 0; row < this.sudokuArray.length; row++) {
+    row = cell[0];
+    col = cell[1];
 
-      // Cols
-      for (let col = 0; col < this.sudokuArray[row].length; col++) {
+    // If no empty cell
+    if (row === -1) {
 
-        boxNumber = this.generateBoxNumber(row, col);
+      return true;
 
-        // Trying to assign value of (1..9)
-        for (let value = 1; value <= 9; value++) {
+    }
 
-          // If it's 0, assign value
-          if (this.sudokuArray[row][col] === 0) {
+    // Try assign a number, between 1 to 9
+    for (let num = 1; num <= 9; num++) {
 
-            // If passed the checkers (checkRow(), checkCol(), and check3x3Box())
-            if ((!this.checkRow(row, value)) && (!this.checkCol(col, value)) && (!this.check3x3Box(boxNumber, value))) {
+      if (this.validator(this.sudokuArray, row, col, num)) {
 
-              this.sudokuArray[row][col] = value;
+        this.sudokuArray[row][col] = num;
 
-              this.solvedList.push([row, col]);
+        if (this.solve(row, col)) {
 
-            }
-
-          }
+          return true;
 
         }
 
-        // If it's still 0, push it to this.unsolvedList
-        if (this.sudokuArray[row][col] === 0) {
-
-          this.unsolvedList.push([row, col]);
-
-        }
+        // Mark cell as 0 (unassigned)
+        this.sudokuArray[row][col] = 0;
 
       }
 
     }
 
-    return 0;
+    // Backtracking
+    return false;
 
   }
 
@@ -287,12 +272,13 @@ class Sudoku {
 
     let output = '';
 
+    let dash = ' -------------------------------\n';
+
+    // Start dash
+    output += dash;
+
     // Generate output
     for (let i = 0; i < this.sudokuArray.length; i++) {
-
-      // Start dash
-      if (i === 0)
-        output += ' -------------------------------\n';
 
       for (let j = 0; j < this.sudokuArray.length; j++) {
 
@@ -306,13 +292,12 @@ class Sudoku {
       output += '\n';
 
       if (((i + 1) % 3 === 0) && (i < this.sudokuArray.length - 1))
-        output += ' -------------------------------\n';
-
-      // End dash
-      if (i === this.sudokuArray.length - 1)
-        output += ' -------------------------------';
+        output += dash;
 
     }
+
+    // End dash
+    output += dash;
 
     return output;
 
@@ -323,19 +308,26 @@ class Sudoku {
 // The file has newlines at the end of each line,
 // so we call split to remove it (\n)
 var fs = require('fs');
+
 var board_string = fs.readFileSync('set-01_sample.unsolved.txt')
   .toString()
-  .split("\n")[0];
+  .split("\n");
 
-let test = '105802000090076405200400819019007306762083090000061050007600030430020501600308900';
+// Loop all sample, (length - 1, because there's a newline at EOF)
+for (let i = 0; i < board_string.length - 1; i++) {
 
-var game = new Sudoku(test);
+  let game = new Sudoku(board_string[i]);
 
-// Convert unsolved string to array
-game.init();
+  console.log('Sample', i + 1);
+
+  // Convert unsolved string to array
+  game.init();
 
 
-// Solve the game
-game.solve();
+  // Solve the game
+  game.solve();
 
-console.log(game.board());
+  console.log(game.board());
+
+}
+
