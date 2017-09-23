@@ -56,15 +56,15 @@ class Sudoku {
   // Returns a string representing the current state of the board
   board() {
     var result = "---------------------\n";
-    for(var i =0;i<9;i++){
-      for(var j =0;j<9;j++){
+    for (var i = 0; i < 9; i++) {
+      for (var j = 0; j < 9; j++) {
         result += this.sudoBoard[i][j] + ' ';
-        if((j+1) % 3 === 0 && j !== 8){
-          result+='| ';
+        if ((j + 1) % 3 === 0 && j !== 8) {
+          result += '| ';
         }
       }
-      result+='\n';
-      if((i+1)%3===0 && i !== 8){
+      result += '\n';
+      if ((i + 1) % 3 === 0 && i !== 8) {
         result += "---------------------\n";
       }
     }
@@ -148,14 +148,20 @@ class Sudoku {
 // The file has newlines at the end of each line,
 // so we call split to remove it (\n)
 var fs = require('fs')
-var board_string = fs.readFileSync('set-01_sample.unsolved.txt')
+var data = fs.readFileSync('set-01_sample.unsolved.txt')
   .toString()
-  .split("\n")[0]
+  .split("\n");
 
-var game = new Sudoku(board_string)
-
-// Remember: this will just fill out what it can and not "guess"
-game.getAll();
-game.find0(game.sudoBoard);
-game.solve();
-console.log(game.board());
+for (var i = 0; i < data.length-1; i++) {
+  console.log(i);
+  console.log("BEFORE");
+  var board_string = data[i];
+  var game = new Sudoku(board_string);
+  // Remember: this will just fill out what it can and not "guess"
+  console.log(game.board());
+  game.getAll();
+  game.find0(game.sudoBoard);
+  game.solve();
+  console.log("AFTER");
+  console.log(game.board());
+}
