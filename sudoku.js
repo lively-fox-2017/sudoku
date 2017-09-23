@@ -156,19 +156,9 @@ var game = new Sudoku(board_string)
 // Remember: this will just fill out what it can and not "guess"
 var grid = game.create_board()
 game.solve()
+console.log(grid)
 console.log('==================Cara Naif=============')
 console.log(game.solve())
 console.log('==============Cara Backtrack============')
 console.log(game.solvePuzzle())
 // console.log('==============Cek posisi yang kosong============')
-// console.log(game.checkempty())
-// console.log(game.checkBox(1,1,1));
-// console.log(game.checkBox(1,1,2));
-// console.log(game.checkBox(1,1,3));
-// console.log(game.checkBox(1,1,4));
-// console.log(game.checkBox(1,1,5));
-// console.log(game.checkBox(1,1,6));
-// console.log(game.checkBox(1,1,7));
-// console.log(game.checkBox(1,1,8));
-// console.log(game.checkBox(1,1,9));
-// console.log(game.board)
