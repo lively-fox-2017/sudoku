@@ -32,8 +32,8 @@ class Sudoku {
   	while(j!=temp.length){
   		temp1=temp[j].split('')
   		for(let i=0;i<9;i++){
-  			if(this.checkRow(temp1[0],i) && this.checkCol(temp1[1],i) && this.checkRegion(i,temp1[1],temp1[0])){
-				this.input[temp1[0]][temp1[1]]=i  				
+  			if(this.checkRow(temp1[0],i.toString()) && this.checkCol(temp1[1],i.toString()) && this.checkRegion(i.toString(),temp1[1],temp1[0])){
+				this.input[temp1[0]][temp1[1]]=i.toString()  				
   			}
   		}
   		j++
