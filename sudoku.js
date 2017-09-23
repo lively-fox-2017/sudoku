@@ -339,9 +339,3 @@ game.init();
 game.solve();
 
 console.log(game.board());
-
-console.log(game.solvedList);
-console.log(game.unsolvedList);
-
-// Log to console the output finished board
-// game.board();
