@@ -1,12 +1,146 @@
 "use strict"
 
 class Sudoku {
-  constructor(board_string) {}
+  constructor(board_string) {
+    this.boardString = board_string;
+    this.arrBoard = [];
 
-  solve() {}
+  }
 
   // Returns a string representing the current state of the board
-  board() {}
+  board() {
+    var splitBoard = this.boardString.split('');
+    var tempBoard = splitBoard.map(Number);
+    var boardLenght = tempBoard.length;
+
+
+    for(let i = 0; i , tempBoard.length; i++){
+      this.arrBoard.push(tempBoard.splice(0,9));
+    }
+
+    return this.arrBoard
+
+  }
+
+  ambilMatrixKosong(){
+    let nolPosition = [];
+    for (let i = 0; i < this.arrBoard.length; i++){
+      for(let j = 0; j< this.arrBoard[i].length; j++){
+        if(this.arrBoard[i][j]=== 0){
+          nolPosition.push([i,j])
+        }
+      }
+    }
+    return nolPosition
+  }
+
+
+  cekColumn(column,value){
+    for(let i = 0; i < this.arrBoard.length; i++){
+        // let cek = this.arrBoard[i][column]
+        // console.log(''+cek);
+        if (value === this.arrBoard[i][column]){
+          return false
+        }
+    }
+
+    return true
+  }
+
+  cekRow(row, value){
+    for(let i = 0; i < this.arrBoard[row].length; i++){
+        // let cek = this.arrBoard[row][i]
+        // console.log(''+cek);
+        if (value === this.arrBoard[row][i]){
+          return false
+        }
+    }
+
+    return true
+  }
+
+  cekMatrix(column,row, value){
+
+    var columnCorner = 0;
+    var  rowCorner = 0;
+    var  matrix3x3 = 3;
+
+  // cari di kolom kiri Find the left-most column
+  while(column >= columnCorner + matrix3x3) {
+    columnCorner += matrix3x3;
+  }
+
+  // cari di baris atasnya Find the upper-most row
+  while(row >= rowCorner + matrix3x3) {
+    rowCorner += matrix3x3;
+  }
+
+  // looping tiap baris
+  for(var i = rowCorner; i < rowCorner + matrix3x3; i++) {
+    // looping tiap kolom
+    for(var j = columnCorner; j < columnCorner + matrix3x3; j++) {
+      // jika ditemukan
+      if(this.arrBoard[i][j] === value) {
+        return false;
+      }
+    }
+  }
+  // jika tidak ditemukan
+  return true;
+  }
+
+  cekValue(column, row, value){
+    if(this.cekColumn(column,value) && this.cekRow(row, value) && this.cekMatrix(column,row, value)){
+      return true
+    } else {
+      return false
+    }
+  }
+
+
+  solve() {
+    var board = this.arrBoard;
+    var limit = 9;
+    // var total = 0;
+    var isiMatrixKosong = this.ambilMatrixKosong();
+    // console.log(isiMatrixKosong);
+    let row, column, value, ketemu;
+
+    for(let i = 0; i < isiMatrixKosong.length;){
+      // console.log(isiMatrixKosong[i][0]);
+      row = isiMatrixKosong[i][0];
+      column = isiMatrixKosong[i][1];
+
+      value = board[row][column] + 1;
+      ketemu = false;
+
+      while(!ketemu && value <= limit){
+        // total++;
+        if(this.cekValue(column, row,value)) {
+          ketemu = true;
+          board[row][column] = value;
+          // console.log(''+board[row][column]);
+          i++;
+        } else {
+          value++;
+        }
+
+      }
+
+      if(!ketemu){
+        board[row][column] = 0;
+        i--;
+      }
+
+    }
+
+    return board
+
+
+  }
+
+
+
 }
 
 // The file has newlines at the end of each line,
@@ -19,6 +153,29 @@ var board_string = fs.readFileSync('set-01_sample.unsolved.txt')
 var game = new Sudoku(board_string)
 
 // Remember: this will just fill out what it can and not "guess"
-game.solve()
+// game.solve()
+
+// console.log(game.board())
+// console.log('--------------------------------------');
+// console.log(game.cekColumn(3,'2'))
+// console.log(game.cekColumn(0,'7'))
+// console.log('--------------------------------------');
+// console.log(game.cekRow(5,'2'))
+// console.log(game.cekRow(1,'6'))
+// console.log('--------------------------------------');
+// console.log(game.cekMatrix(3,5,'2'))
+// console.log('--------------------------------------');
+// console.log(game.cekValue(3,5,'9'));
+// console.log(game.ambilMatrixKosong());
+// console.log('--------------------------------------');
+// console.log(game.cekValue(1,0,'3'));
+// console.log(game.cekValue(0,1,'4'));
+// console.log(game.cekValue(2,1,'7'));
+// console.log(game.cekValue(1,2,'8'));
+// console.log(game.cekValue(2,2,'6'));
 
 console.log(game.board())
+// console.log('--------------------------------------');
+// console.log(game.ambilMatrixKosong())
+console.log('--------------------------------------');
+console.log(game.solve());
