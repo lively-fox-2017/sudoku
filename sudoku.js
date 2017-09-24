@@ -40,7 +40,7 @@ class Sudoku {
         }
       }
     }
-    // console.log(this.kosong + '-=--------------------');
+    // console.log(this.kosong + '-=----------------------');
     return this.kosong
   }
 
