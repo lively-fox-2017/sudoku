@@ -1,4 +1,6 @@
 "use strict"
+var Benchmark = require('benchmark');
+var suite = new Benchmark.Suite;
 
 class Sudoku {
   constructor(board_string) {
@@ -152,6 +154,10 @@ var data = fs.readFileSync('set-01_sample.unsolved.txt')
   .toString()
   .split("\n");
 
+var data2 = fs.readFileSync('set-02_project-euler_50-easy-puzzles.txt')
+  .toString()
+  .split("\n");
+
 for (var i = 0; i < data.length-1; i++) {
   console.log(i);
   console.log("BEFORE");
@@ -164,4 +170,46 @@ for (var i = 0; i < data.length-1; i++) {
   game.solve();
   console.log("AFTER");
   console.log(game.board());
+
 }
+suite.add('Sudoku set - 01', function() {
+  // for (var i = 0; i < data.length-1; i++) {
+    // console.log(i);
+    // console.log("BEFORE");
+    var board_str = data[0];
+    var sudoBench1 = new Sudoku(board_str);
+    // Remember: this will just fill out what it can and not "guess"
+    // console.log(game.board());
+    sudoBench1.getAll();
+    sudoBench1.find0(sudoBench1.sudoBoard);
+    sudoBench1.solve();
+    // console.log("AFTER");
+    // console.log(game.board());
+
+  // }
+  })
+  .add('Sudoku set - 02', function(){
+    // for (var i = 0; i < data2.length-1; i++) {
+      // console.log(i);
+      // console.log("BEFORE");
+      var board_str = data2[0];
+      var sudoBench2 = new Sudoku(board_str);
+      // Remember: this will just fill out what it can and not "guess"
+      // console.log(game.board());
+      sudoBench2.getAll();
+      sudoBench2.find0(sudoBench2.sudoBoard);
+      sudoBench2.solve();
+      // console.log("AFTER");
+      // console.log(game.board());
+
+    // }
+  })
+// add listeners
+.on('cycle', function(event) {
+  console.log(String(event.target));
+})
+.on('complete', function() {
+  console.log('Fastest is ' + this.filter('fastest').map('name'));
+})
+// run async
+.run({ 'async': true });
