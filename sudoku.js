@@ -6,7 +6,7 @@ class Sudoku {
     for (let i = 0; i < 9; i++) {
       let baris = [];
       for (let j = 0; j < 9; j++) {
-        baris.push(board_string[i * 9 + j]);
+        baris.push(parseInt(board_string[i * 9 + j]));
       }
       this.boardELement.push(baris);
     }
@@ -26,8 +26,9 @@ class Sudoku {
     }
 
     for (let i = 0; i < 9; i++) {
-      element[this.boardELement[x][i]]--;
-      if (element[this.boardELement[x][i]] < 0)
+      this.boardELement[x][i].toString();
+      element[this.boardELement[x][i].toString()]--;
+      if (element[this.boardELement[x][i].toString()] < 0)
         return false;
     }
     return true;
@@ -47,8 +48,8 @@ class Sudoku {
     }
 
     for (let i = 0; i < 9; i++) {
-      element[this.boardELement[i][x]]--;
-      if (element[this.boardELement[i][x]] < 0)
+      element[this.boardELement[i][x].toString()]--;
+      if (element[this.boardELement[i][x].toString()] < 0)
         return false;
     }
     return true;
@@ -90,8 +91,8 @@ class Sudoku {
     let areaWindow = this.initWindow(x, y);
     for (let i = 0; i < areaWindow[0].length; i++) {
       for (let j = 0; j < areaWindow[1].length; j++) {
-        element[this.boardELement[areaWindow[0][i]][areaWindow[0][j]]]--;
-        if (element[this.boardELement[areaWindow[0][i]][areaWindow[0][j]]] < 0)
+        element[this.boardELement[areaWindow[0][i]][areaWindow[0][j]].toString()]--;
+        if (element[this.boardELement[areaWindow[0][i]][areaWindow[0][j]].toString()] < 0)
           return false;
       }
     }
@@ -118,7 +119,43 @@ class Sudoku {
   }
 
   solve() {
-
+    let init = 0;
+    let indexMark = [];
+    let back = false;
+    while (init < 81) {
+      if (this.boardELement[Math.floor(init / 9)][init % 9] != 0 && !back) {
+        // Kalo elemen bukan 0
+        back = false;
+        init++;
+      } else {
+        // Elemen kosong/0 => mesti dicari
+        loop: for (let i = this.boardELement[Math.floor(init / 9)][init % 9] + 1; i <= 10; i++) {
+          // Tes semua angka
+          if (i !== 10) {
+            this.boardELement[Math.floor(init / 9)][init % 9] = i;
+            if (this.rowCheck(Math.floor(init / 9)) && this.colCheck(init % 9) && this.windowCheck(Math.floor(init / 9), init % 9)) {
+              indexMark.push(init);
+              back = false;
+              init++;
+              break loop;
+            }
+          } else {
+            // Kalo ga ada yang bener, balik lagi
+            if (indexMark.length === 0) {
+              // Kalo ga bisa balik, berarti ga ada jawaban
+              return console.log("No Soulution found");
+            } else {
+              // Balikin elemennya jadi 0 dulu lagi
+              this.boardELement[Math.floor(init / 9)][init % 9] = 0;
+              init = indexMark[indexMark.length - 1];
+              indexMark = indexMark.slice(0, indexMark.length - 1);
+              back = true;
+              break loop;
+            }
+          }
+        }
+      }
+    }
   }
 
   // Returns a string representing the current state of the board
@@ -148,12 +185,14 @@ class Sudoku {
 var fs = require('fs')
 var board_string = fs.readFileSync('./set-01_sample.unsolved.txt')
   .toString()
-  .split("\n")[0]
-
-var game = new Sudoku(board_string)
+  .split("\n");
 
 // Remember: this will just fill out what it can and not "guess"
-// game.solve()
-console.log(game.board());
-game.initNumber();
-console.log(game.board());
+
+for (let i = 0; i < board_string.length - 1; i++) {
+  console.log(i);
+  var game = new Sudoku(board_string[i]);
+  console.log(game.board());
+  game.solve();
+  console.log(game.board());
+}
