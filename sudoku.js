@@ -3,16 +3,14 @@
 class Sudoku {
   constructor(board_string) {
     this.boardString = board_string;
-    this.arrBoard = []
-    this. isi = ''
-    this.nolPosition = []
-  }
+    this.arrBoard = [];
 
-  solve() {}
+  }
 
   // Returns a string representing the current state of the board
   board() {
-    var tempBoard = this.boardString.split('')
+    var splitBoard = this.boardString.split('');
+    var tempBoard = splitBoard.map(Number);
     var boardLenght = tempBoard.length;
 
 
@@ -24,11 +22,24 @@ class Sudoku {
 
   }
 
+  ambilMatrixKosong(){
+    let nolPosition = [];
+    for (let i = 0; i < this.arrBoard.length; i++){
+      for(let j = 0; j< this.arrBoard[i].length; j++){
+        if(this.arrBoard[i][j]=== 0){
+          nolPosition.push([i,j])
+        }
+      }
+    }
+    return nolPosition
+  }
+
+
   cekColumn(column,value){
     for(let i = 0; i < this.arrBoard.length; i++){
-        let cek = this.arrBoard[column][i]
+        // let cek = this.arrBoard[i][column]
         // console.log(''+cek);
-        if (value === cek){
+        if (value === this.arrBoard[i][column]){
           return false
         }
     }
@@ -37,10 +48,10 @@ class Sudoku {
   }
 
   cekRow(row, value){
-    for(let i = 0; i < this.arrBoard.length; i++){
-        let cek = this.arrBoard[i][row]
+    for(let i = 0; i < this.arrBoard[row].length; i++){
+        // let cek = this.arrBoard[row][i]
         // console.log(''+cek);
-        if (value === cek){
+        if (value === this.arrBoard[row][i]){
           return false
         }
     }
@@ -50,9 +61,9 @@ class Sudoku {
 
   cekMatrix(column,row, value){
 
-    var columnCorner = 0
-    var  rowCorner = 0
-    var  matrix3x3 = 3
+    var columnCorner = 0;
+    var  rowCorner = 0;
+    var  matrix3x3 = 3;
 
   // cari di kolom kiri Find the left-most column
   while(column >= columnCorner + matrix3x3) {
@@ -86,15 +97,46 @@ class Sudoku {
     }
   }
 
-  isiMatrixKosong(){
-    for (let i = 0; i < this.arrBoard.length; i++){
-      for(let j = 0; j< this.arrBoard.length; j++){
-        if(this.arrBoard[i][j]==='0'){
-          this.nolPosition.push([i,j])
+
+  solve() {
+    var board = this.arrBoard;
+    var limit = 9;
+    // var total = 0;
+    var isiMatrixKosong = this.ambilMatrixKosong();
+    // console.log(isiMatrixKosong);
+    let row, column, value, ketemu;
+
+    for(let i = 0; i < isiMatrixKosong.length;){
+      // console.log(isiMatrixKosong[i][0]);
+      row = isiMatrixKosong[i][0];
+      column = isiMatrixKosong[i][1];
+
+      value = board[row][column] + 1;
+      ketemu = false;
+
+      while(!ketemu && value <= limit){
+        // total++;
+        if(this.cekValue(column, row,value)) {
+          ketemu = true;
+          board[row][column] = value;
+          // console.log(''+board[row][column]);
+          i++;
+        } else {
+          value++;
         }
+
       }
+
+      if(!ketemu){
+        board[row][column] = 0;
+        i--;
+      }
+
     }
-    return this.nolPosition
+
+    return board
+
+
   }
 
 
@@ -113,16 +155,27 @@ var game = new Sudoku(board_string)
 // Remember: this will just fill out what it can and not "guess"
 // game.solve()
 
+// console.log(game.board())
+// console.log('--------------------------------------');
+// console.log(game.cekColumn(3,'2'))
+// console.log(game.cekColumn(0,'7'))
+// console.log('--------------------------------------');
+// console.log(game.cekRow(5,'2'))
+// console.log(game.cekRow(1,'6'))
+// console.log('--------------------------------------');
+// console.log(game.cekMatrix(3,5,'2'))
+// console.log('--------------------------------------');
+// console.log(game.cekValue(3,5,'9'));
+// console.log(game.ambilMatrixKosong());
+// console.log('--------------------------------------');
+// console.log(game.cekValue(1,0,'3'));
+// console.log(game.cekValue(0,1,'4'));
+// console.log(game.cekValue(2,1,'7'));
+// console.log(game.cekValue(1,2,'8'));
+// console.log(game.cekValue(2,2,'6'));
+
 console.log(game.board())
+// console.log('--------------------------------------');
+// console.log(game.ambilMatrixKosong())
 console.log('--------------------------------------');
-console.log(game.cekColumn(3,'2'))
-console.log(game.cekColumn(0,'7'))
-console.log('--------------------------------------');
-console.log(game.cekRow(5,'2'))
-console.log(game.cekRow(1,'6'))
-console.log('--------------------------------------');
-console.log(game.cekMatrix(3,5,'2'))
-console.log('--------------------------------------');
-console.log(game.cekValue(3,5,'9'));
-console.log('--------------------------------------');
-console.log(game.isiMatrixKosong());
+console.log(game.solve());
